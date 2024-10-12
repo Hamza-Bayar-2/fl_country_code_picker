@@ -160,29 +160,16 @@ class FlCountryCodePicker {
   /// Returns the selected [CountryCode].
   Future<CountryCode?> showPicker({
     required BuildContext context,
-    bool fullScreen = false,
     ShapeBorder shape = kShape,
     double pickerMinHeight = 150,
     double pickerMaxHeight = 500,
     String? initialSelectedLocale,
+    bool dialogFullscreen = false,
     bool scrollToDeviceLocale = false,
     Color barrierColor = kBarrierColor,
     Clip? clipBehavior = Clip.hardEdge,
     Color backgroundColor = kBackgroundColor,
   }) async {
-    final fullScreenHeight = MediaQuery.of(context).size.height;
-    final allowance = MediaQuery.of(context).padding.top -
-        MediaQuery.of(context).padding.bottom;
-
-    // Dynamic modal height computation.
-    final maxHeight =
-        fullScreen ? fullScreenHeight - allowance : pickerMaxHeight;
-
-    final constraints = BoxConstraints(
-      maxHeight: maxHeight,
-      minHeight: pickerMinHeight,
-    );
-
     // For automatic scrolling.
     final deviceLocale = ui.PlatformDispatcher.instance.locale.countryCode;
 
@@ -197,38 +184,40 @@ class FlCountryCodePicker {
       }
     }
 
-    final country = showModalBottomSheet<CountryCode?>(
-      elevation: 0,
-      shape: shape,
+    final country = showDialog<CountryCode?>(
       context: context,
-      useSafeArea: true,
-      constraints: constraints,
-      clipBehavior: clipBehavior,
       barrierColor: barrierColor,
-      backgroundColor: backgroundColor,
-      isScrollControlled: true,
-      builder: (_) => CountryCodePickerModal(
-        title: title,
-        defaultAppbarBackgroundColor: defaultAppbarBackgroundColor,
-        defaultAppbarForegroundColor: defaultAppbarForegroundColor,
-        defaultAppbarCloseIconBackgroundColor:
+      builder: (_) {
+        // Ortak olan widget yapılandırmasını buraya alıyoruz
+        final modalContent = CountryCodePickerModal(
+          title: title,
+          defaultAppbarBackgroundColor: defaultAppbarBackgroundColor,
+          defaultAppbarForegroundColor: defaultAppbarForegroundColor,
+          defaultAppbarCloseIconBackgroundColor:
             defaultAppbarCloseIconBackgroundColor,
-        defaultAppbarText: defaultAppbarText,
-        defaultAppbarCloseIcon: defaultAppbarCloseIcon,
-        localize: localize,
-        favorites: favorites,
-        showDialCode: showDialCode,
-        favoritesIcon: favoritesIcon,
-        horizontalTitleGap: horizontalTitleGap,
-        showSearchBar: showSearchBar,
-        filteredCountries: filteredCountries,
-        searchBarDecoration: searchBarDecoration,
-        focusedCountry: focusedCountry,
-        countryTextStyle: countryTextStyle,
-        dialCodeTextStyle: dialCodeTextStyle,
-        searchBarTextStyle: searchBarTextStyle,
-      ),
+          defaultAppbarText: defaultAppbarText,
+          defaultAppbarCloseIcon: defaultAppbarCloseIcon,
+          localize: localize,
+          favorites: favorites,
+          showDialCode: showDialCode,
+          favoritesIcon: favoritesIcon,
+          horizontalTitleGap: horizontalTitleGap,
+          showSearchBar: showSearchBar,
+          filteredCountries: filteredCountries,
+          searchBarDecoration: searchBarDecoration,
+          focusedCountry: focusedCountry,
+          countryTextStyle: countryTextStyle,
+          dialCodeTextStyle: dialCodeTextStyle,
+          searchBarTextStyle: searchBarTextStyle,
+        );
+
+        // Ekran tam boyutta mı olacağına göre doğru dialog'u seçiyoruz
+        return dialogFullscreen
+            ? Dialog.fullscreen(child: modalContent,)
+            : Dialog(shape: shape, child: modalContent,);
+      },
     );
+
 
     return country;
   }

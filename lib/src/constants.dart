@@ -34,5 +34,7 @@ const kShape = RoundedRectangleBorder(
   borderRadius: BorderRadius.only(
     topLeft: kBorderRadius,
     topRight: kBorderRadius,
+    bottomRight: kBorderRadius,
+    bottomLeft: kBorderRadius,
   ),
 );

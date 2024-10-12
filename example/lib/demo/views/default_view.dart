@@ -33,9 +33,10 @@ class _DefaultPickerViewState extends State<DefaultPickerView> {
           } else {
             hasMaxLengthError = false;
           }
-
-          setState(() {});
+        } else {
+          hasMaxLengthError = false;
         }
+        setState(() {});
       });
 
     countryPicker = const FlCountryCodePicker(
@@ -87,17 +88,31 @@ class _DefaultPickerViewState extends State<DefaultPickerView> {
           controller: phoneTextController,
           textInputAction: TextInputAction.done,
           keyboardType: TextInputType.number,
+          maxLength: countryCode!.nationalSignificantNumber,
           decoration: InputDecoration(
             prefix: GestureDetector(
               onTap: () async {
                 final code = await countryPicker.showPicker(
                   context: context,
                   scrollToDeviceLocale: true,
+                  dialogFullscreen: false,
                 );
                 if (code != null) {
                   setState(() => countryCode = code);
                   countryTextController.text = code.name;
                 }
+                if (countryCode != null &&
+                    countryCode!.nationalSignificantNumber != null) {
+                  if (phoneTextController.text.length !=
+                      countryCode!.nationalSignificantNumber!) {
+                    hasMaxLengthError = true;
+                  } else {
+                    hasMaxLengthError = false;
+                  }
+                } else {
+                  hasMaxLengthError = false;
+                }
+                setState(() {});
               },
               child: Container(
                 padding:
@@ -166,6 +181,7 @@ class _DefaultPickerViewState extends State<DefaultPickerView> {
   @override
   void dispose() {
     countryTextController.dispose();
+    phoneTextController.dispose();
     super.dispose();
   }
 }
